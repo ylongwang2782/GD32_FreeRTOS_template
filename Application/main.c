@@ -5,7 +5,6 @@
 #include "deca_regs.h"
 #include "freertos.h"
 #include "gd32f4xx.h"
-#include "systick.h"
 #include "task.h"
 
 static dwt_config_t config = {
@@ -36,8 +35,6 @@ static uint16_t frame_len = 0;
 
 /* Buffer to store received frame. See NOTE 1 below. */
 #define FRAME_LEN_MAX 127
-
-static uint8_t rx_buffer[FRAME_LEN_MAX];
 
 void uart3_init() {
     rcu_periph_clock_enable(RCU_GPIOA);
@@ -90,7 +87,7 @@ void spi3_init() {
     spi_init_struct.frame_size = SPI_FRAMESIZE_8BIT;
     spi_init_struct.clock_polarity_phase = SPI_CK_PL_LOW_PH_1EDGE;
     spi_init_struct.nss = SPI_NSS_SOFT;
-    spi_init_struct.prescale = SPI_PSC_32;
+    spi_init_struct.prescale = SPI_PSC_128;
     spi_init_struct.endian = SPI_ENDIAN_MSB;
     spi_init(SPI3, &spi_init_struct);
 
@@ -109,7 +106,7 @@ void port_set_dw1000_fastrate_spi3(void) {
     spi_init_struct.endian = SPI_ENDIAN_MSB;
     spi_init_struct.nss = SPI_NSS_SOFT;
     spi_init_struct.clock_polarity_phase = SPI_CK_PL_LOW_PH_1EDGE;
-    spi_init_struct.prescale = SPI_PSC_4;
+    spi_init_struct.prescale = SPI_PSC_32;
     spi_init(SPI3, &spi_init_struct);
 
     spi_enable(SPI3);
@@ -192,7 +189,7 @@ static void Slave_Task(void *pvParameters) {
 }
 
 int main(void) {
-    systick_config();
+//    systick_config();
 
     nvic_priority_group_set(NVIC_PRIGROUP_PRE4_SUB0);
 
